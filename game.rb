@@ -1,5 +1,31 @@
 class Code
-  def generate_random
+  COLORS = %w[R G B Y O P]
+
+  def initialize(colors = [])
+    @colors = colors.map(&:upcase)
+  end
+  
+  def self.generate_random
+    new(COLORS.sample)
+  end
+
+  def compare(player_code)
+    black_pegs = 0
+    white_pegs = 0
+
+    @colors.each_with_index do |color, index|
+      if color == player_code.colors[index]
+        black_pegs += 1
+      elsif player_code.colors.include?(color)
+        white_pegs += 1
+      end
+    end
+
+    [black_pegs, white_pegs]
+  end
+
+  def to_s
+    @colors.join
   end
 end
 
@@ -16,6 +42,7 @@ end
 
 class Player
   def make_guess
+  end
 end
 
 secret_code = Code.generate_random
