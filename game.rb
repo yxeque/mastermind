@@ -4,9 +4,9 @@ class Code
   def initialize(colors = [])
     @colors = colors.map(&:upcase)
   end
-  
+
   def self.generate_random
-    new(COLORS.sample)
+    new(COLORS.sample(4))
   end
 
   def compare(player_code)
@@ -30,18 +30,39 @@ class Code
 end
 
 class Feedback
-  def calculate
+  attr_reader :black_pegs, :white_pegs
+
+  def initialize(black_pegs, white_pegs)
+    @black_pegs = black_pegs
+    @white_pegs = white_pegs
   end
 
-  def black_pegs
-  end
-
-  def white_pegs
+  def self.calculate(secret_code, guess_code)
+    black_pegs, white_pegs = secret_code.compare(guess_code)
+    new(black_pegs, white_pegs)
   end
 end
 
 class Player
+  def initialize(role = "guesser")
+    @role = role
+  end
+
+  def role
+    @role
+  end
+
+  def opponent
+    @role == "guesser" ? "codemaker" : "guesser"
+  end
+
   def make_guess
+    if @role == "guesser"
+      puts "Enter your guess (4 colors from R, G, B, Y, O, P):"
+      guess_colors = gets.chomp.upcase.chars
+      Code.new(guess_colors)
+    end
+
   end
 end
 
@@ -67,3 +88,9 @@ end
 if !is_won
   puts "Sorry, you couldn't guess the code. The secret code was: #{secret_code}"
 end
+
+secret_code = Code.new(["R", "B", "O", "Y"])    # Create a test code manually
+guess_code = Code.new(['Y', 'B', 'R', 'O'])
+
+feedback = Feedback.calculate(secret_code, guess_code)
+puts "Feedback: #{feedback.black_pegs} black pegs, #{feedback.white_pegs} white pegs"
