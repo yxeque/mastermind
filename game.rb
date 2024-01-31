@@ -66,7 +66,13 @@ class Player
       puts "Enter your guess (4 colors from R, G, B, Y, O, P):"
       guess_colors = gets.chomp.upcase.chars
       while guess_colors.length != 4
-        puts "Invalid guess length. Please enter exactly 4 colors."
+
+        if guess_colors.any? { |c| !Code::COLORS.include?(c) }
+          puts "Invalid characters! Please only use R, G, B, Y, O, P."
+        else
+          puts "Invalid guess length. Please enter exactly 4 colors."
+        end
+
         guess_colors = gets.chomp.upcase.chars
       end
       Code.new(guess_colors)
