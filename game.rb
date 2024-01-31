@@ -42,6 +42,7 @@ class Feedback
   end
 
   def self.calculate(secret_code, guess_code)
+    return nil if guess_code.nil? 
     black_pegs, white_pegs = secret_code.compare(guess_code)
     new(black_pegs, white_pegs)
   end
@@ -64,6 +65,10 @@ class Player
     if @role == "guesser"
       puts "Enter your guess (4 colors from R, G, B, Y, O, P):"
       guess_colors = gets.chomp.upcase.chars
+      while guess_colors.length != 4
+        puts "Invalid guess length. Please enter exactly 4 colors."
+        guess_colors = gets.chomp.upcase.chars
+      end
       Code.new(guess_colors)
     end
 
@@ -82,6 +87,10 @@ while !is_won && turn_number <= 10
   guess = current_player.make_guess
   feedback = Feedback.calculate(secret_code, guess)
   puts "Feedback: #{feedback.black_pegs} black pegs, #{feedback.white_pegs} white pegs"
+  if feedback.nil?
+    puts "Invalid guess! Please enter exactly 4 colors from R, G, B, Y, O, P."
+    next
+  end
 
   if feedback.black_pegs == 4
     puts "I cracked your code! The secret code was #{secret_code}."
