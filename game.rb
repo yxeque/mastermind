@@ -7,20 +7,20 @@ class Code
     @colors = colors.map(&:upcase)
   end
 
-  def self.generate_random
+  def self.generate_random # Randomly generates code from given COLORS constant
     new(COLORS.sample(4))
   end
 
-  attr_reader :colors
+  attr_reader :colors # getter method for @colors
 
-  def compare(player_code)
+  def compare(player_code) # Compares player_code (guesser) to the randomly generated code from the computer (codemaker)
     black_pegs = 0
     white_pegs = 0
 
     @colors.each_with_index do |color, index|
-      if color == player_code.colors[index]
+      if color == player_code.colors[index] # if guess index is in the same positon of a secret code index increment black_pegs
         black_pegs += 1
-      elsif player_code.colors.include?(color)
+      elsif player_code.colors.include?(color) # if any guess character matches with the secret code increment white_pegs
         white_pegs += 1
       end
     end
@@ -28,20 +28,20 @@ class Code
     [black_pegs, white_pegs]
   end
 
-  def to_s
+  def to_s # Convert to string for easier printing
     @colors.join
   end
 end
 
-class Feedback
-  attr_reader :black_pegs, :white_pegs
+class Feedback # Stores the number of black and white pegs
+  attr_reader :black_pegs, :white_pegs # getter methods for black_pegs and white_pegs
 
   def initialize(black_pegs, white_pegs)
     @black_pegs = black_pegs
     @white_pegs = white_pegs
   end
 
-  def self.calculate(secret_code, guess_code)
+  def self.calculate(secret_code, guess_code) # Calculates the feedback for the given secret code through Code.compare
     return nil if guess_code.nil?
 
     black_pegs, white_pegs = secret_code.compare(guess_code)
@@ -50,22 +50,18 @@ class Feedback
 end
 
 class Player
-  def initialize(role = 'guesser')
+  def initialize(role = 'guesser') # guesser is the only role (because I'm lazy) - kinda pointless *for now* to program a separate "human" codemaker so instead the codemaker is the computer and the secret code is randomly generated
     @role = role
   end
 
   attr_reader :role
-
-  def opponent
-    @role == 'guesser' ? 'codemaker' : 'guesser'
-  end
 
   def make_guess
     return unless @role == 'guesser'
 
     puts 'Enter your guess (4 colors from R, G, B, Y, O, P):'
     guess_colors = gets.chomp.upcase.chars
-    while guess_colors.length != 4
+    while guess_colors.length != 4 # Some issues with error handling that I could not fix - if length is 4 (even with integers and numbers other than the given COLORS) the code still goes through
 
       if guess_colors.any? { |c| !Code::COLORS.include?(c) }
         puts 'Invalid characters! Please only use R, G, B, Y, O, P.'
