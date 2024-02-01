@@ -79,29 +79,37 @@ class Player
   end
 end
 
-secret_code = Code.generate_random
-# puts secret_code
-
-current_player = Player.new('guesser')
-turn_number = 1
-is_won = false
-
-while !is_won && turn_number <= 10
-
-  guess = current_player.make_guess
-  feedback = Feedback.calculate(secret_code, guess)
-  puts "Feedback: #{feedback.black_pegs} black pegs, #{feedback.white_pegs} white pegs"
-  if feedback.nil?
-    puts 'Invalid guess! Please enter exactly 4 colors from R, G, B, Y, O, P.'
-    next
+class Game
+  def initialize(secret_code)
+    @secret_code = secret_code
+    @current_player = Player.new('guesser')
+    @turn_number = 1
+    @is_won = false
   end
 
-  if feedback.black_pegs == 4
-    puts "You guessed right! The secret code was #{secret_code}."
-    is_won = true
-  else
-    turn_number += 1
+  def play
+    while !@is_won && @turn_number <= 10
+
+      guess = @current_player.make_guess
+      feedback = Feedback.calculate(@secret_code, guess)
+      puts "Feedback: #{feedback.black_pegs} black pegs, #{feedback.white_pegs} white pegs"
+      if feedback.nil?
+        puts 'Invalid guess! Please enter exactly 4 colors from R, G, B, Y, O, P.'
+        next
+      end
+    
+      if feedback.black_pegs == 4
+        puts "You guessed right! The secret code was #{@secret_code}."
+        @is_won = true
+      else
+        @turn_number += 1
+      end
+    end
+    
+    puts "Looks like you lost this time. The secret code was #{@secret_code}" unless @is_won
   end
 end
 
-puts "Looks like you lost this time. The secret code was #{secret_code}" unless is_won
+secret_code = Code.generate_random
+game = Game.new(secret_code)
+game.play
