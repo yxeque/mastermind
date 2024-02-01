@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class Code
-  COLORS = %w[R G B Y O P]
+  COLORS = %w[R G B Y O P].freeze
 
   def initialize(colors = [])
     @colors = colors.map(&:upcase)
@@ -9,9 +11,7 @@ class Code
     new(COLORS.sample(4))
   end
 
-  def colors
-    @colors
-  end
+  attr_reader :colors
 
   def compare(player_code)
     black_pegs = 0
@@ -42,49 +42,47 @@ class Feedback
   end
 
   def self.calculate(secret_code, guess_code)
-    return nil if guess_code.nil? 
+    return nil if guess_code.nil?
+
     black_pegs, white_pegs = secret_code.compare(guess_code)
     new(black_pegs, white_pegs)
   end
 end
 
 class Player
-  def initialize(role = "guesser")
+  def initialize(role = 'guesser')
     @role = role
   end
 
-  def role
-    @role
-  end
+  attr_reader :role
 
   def opponent
-    @role == "guesser" ? "codemaker" : "guesser"
+    @role == 'guesser' ? 'codemaker' : 'guesser'
   end
 
   def make_guess
-    if @role == "guesser"
-      puts "Enter your guess (4 colors from R, G, B, Y, O, P):"
-      guess_colors = gets.chomp.upcase.chars
-      while guess_colors.length != 4
+    return unless @role == 'guesser'
 
-        if guess_colors.any? { |c| !Code::COLORS.include?(c) }
-          puts "Invalid characters! Please only use R, G, B, Y, O, P."
-        else
-          puts "Invalid guess length. Please enter exactly 4 colors."
-        end
+    puts 'Enter your guess (4 colors from R, G, B, Y, O, P):'
+    guess_colors = gets.chomp.upcase.chars
+    while guess_colors.length != 4
 
-        guess_colors = gets.chomp.upcase.chars
+      if guess_colors.any? { |c| !Code::COLORS.include?(c) }
+        puts 'Invalid characters! Please only use R, G, B, Y, O, P.'
+      else
+        puts 'Invalid guess length. Please enter exactly 4 colors.'
       end
-      Code.new(guess_colors)
-    end
 
+      guess_colors = gets.chomp.upcase.chars
+    end
+    Code.new(guess_colors)
   end
 end
 
 secret_code = Code.generate_random
-puts secret_code
+# puts secret_code
 
-current_player = Player.new("guesser")
+current_player = Player.new('guesser')
 turn_number = 1
 is_won = false
 
@@ -94,19 +92,16 @@ while !is_won && turn_number <= 10
   feedback = Feedback.calculate(secret_code, guess)
   puts "Feedback: #{feedback.black_pegs} black pegs, #{feedback.white_pegs} white pegs"
   if feedback.nil?
-    puts "Invalid guess! Please enter exactly 4 colors from R, G, B, Y, O, P."
+    puts 'Invalid guess! Please enter exactly 4 colors from R, G, B, Y, O, P.'
     next
   end
 
   if feedback.black_pegs == 4
-    puts "I cracked your code! The secret code was #{secret_code}."
+    puts "You guessed right! The secret code was #{secret_code}."
     is_won = true
   else
     turn_number += 1
   end
 end
 
-if !is_won
-  puts "You successfully kept your code secret! Congratulations!"
-end
-
+puts "Looks like you lost this time. The secret code was #{secret_code}" unless is_won

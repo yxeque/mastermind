@@ -1,2 +1,1 @@
-# mastermind
-Project: Mastermind in Ruby
+# Project: Mastermind
